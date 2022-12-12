@@ -1,0 +1,4 @@
+.gitattributes
+LICENSE
+.git
+__pycache__

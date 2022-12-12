@@ -1,35 +1,56 @@
 from matplotlib import pyplot as plt
 import numpy as np
 import math
+from graphs import c2DReader
 
-duration = 1 # s
-frequency = 100 # Hz
-sample_rate = 1000 # sample per second
+duration = 3 # s
+frequency = 10 # Hz
+sample_rate = 100 # sample per second
 time = np.arange(0.0, duration, duration/sample_rate)
+sparam = np.arange(0.01, 100, 0.01)
 
 def wavelet(time, scale=1, offset=0):
 	Xcomp = (time - offset) / scale
-	exp = math.exp(-Xcomp * Xcomp)
-	return math.sin(Xcomp)*exp
+	exp = np.exp(-Xcomp * Xcomp)
+	return np.sin(Xcomp)*exp
 
-def sinewave(time, frequency=440):
-	w0 = math.pi * 2 / frequency
-	return np.sin(time)
+def sinewave(time, frequency=440, amplitude=1):
+	w = frequency * math.pi * 2
+	return amplitude * np.sin(time * w)
 
 def integral(function):
 	return np.sum(function)/len(function)
 
-signal = sinewave(time, frequency=100)
+s11 = sinewave(time[:int(len(time)/3)], frequency=10, amplitude=10)
+s12 = sinewave(time[:int(len(time)/3)], frequency=20, amplitude=5)
+s13 = sinewave(time[:int(len(time)/3)], frequency=100, amplitude=1)
 
-# transform = []
-# for dt in simple_time:
-# 	transform.append(integral(signal * wavelet(10, dt, simple_time)))
+s21 = sinewave(time[int(len(time)/3):2*int(len(time)/3)], frequency=5, amplitude=8)
+s22 = sinewave(time[int(len(time)/3):2*int(len(time)/3)], frequency=30, amplitude=5)
+s23 = sinewave(time[int(len(time)/3):2*int(len(time)/3)], frequency=20, amplitude=1)
 
-plt.figure()
-# plt.subplot(211)
-# plt.plot(simple_time, transform)
+s31 = sinewave(time[2*int(len(time)/3):], frequency=2, amplitude=6)
+s32 = sinewave(time[2*int(len(time)/3):], frequency=30, amplitude=4)
+s33 = sinewave(time[2*int(len(time)/3):], frequency=50, amplitude=2)
 
-plt.subplot(111)
-plt.plot(time, signal)
+seg1 = s11 + s12 + s13
+seg2 = s21 + s22 + s23
+seg3 = s31 + s32 + s33
 
-plt.show()
+signal = np.concatenate((seg1,seg2,seg3))
+# c2DReader.show(time,signal)
+# wave = wavelet(time, offset=5)
+
+transform = np.zeros((len(time), len(sparam)))
+print(len(time))
+for x in np.arange(0,len(time)):
+	if x % 10 == 0:
+		print(x)
+	for y in np.arange(0,len(sparam)):
+		transform[x][y] = integral(signal * wavelet(time, scale=sparam[y] ,offset=time[x]))
+
+
+with open("data/2Darray.npy","wb") as f:
+	np.save(f, transform)
+
+print("done!")
