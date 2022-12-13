@@ -9,10 +9,10 @@ sample_rate = 100 # sample per second
 time = np.arange(0.0, duration, duration/sample_rate)
 sparam = np.arange(0.01, 100, 0.01)
 
-def wavelet(time, scale=1, offset=0):
-	Xcomp = (time - offset) / scale
-	exp = np.exp(-Xcomp * Xcomp)
-	return np.sin(Xcomp)*exp
+def wavelet(time, scale=1, offset=0, frequency=440):
+	Xcomp = (time - offset)
+	exp = np.exp(- (4 * math.log(2) * Xcomp**2) / scale**2)
+	return np.sin(Xcomp * 2 * math.pi * frequency)*exp
 
 def sinewave(time, frequency=440, amplitude=1):
 	w = frequency * math.pi * 2
@@ -47,7 +47,7 @@ for x in np.arange(0,len(time)):
 	if x % 10 == 0:
 		print(x)
 	for y in np.arange(0,len(sparam)):
-		transform[x][y] = integral(signal * wavelet(time, scale=sparam[y] ,offset=time[x]))
+		transform[x][y] = integral(signal * wavelet(time, frequency=sparam[y] ,offset=time[x]))
 
 
 with open("data/2Darray.npy","wb") as f:
