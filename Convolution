@@ -1,0 +1,48 @@
+"""__________setup__________"""
+import numpy as np
+
+A = np.array([[2,1,3,0],[1,1,0,5],[3,3,1,0],[2,0,0,2]]) #tableau
+M = np.array([[1,0,2],[2,1,0],[1,0,3]]) #matrice
+"""__________simple__________"""
+def simple():
+    from scipy import signal
+    
+    B = signal.convolve2d(A, M, mode='same', boundary='fill')
+    return B
+"""__________pas simple__________"""
+def pas_simple():
+    
+#Transformation Tableau
+    sub=[]
+    Al = A.tolist()
+    for k in range(len(Al)):
+        Al[k].append(0)
+        Al[k].insert(0,0)
+    for l in range(len(Al[1])):
+        sub.append(0)
+    Al.append(sub)
+    Al.insert(0,sub)
+    At = np.array([np.array(i, dtype=int) for i in Al], dtype=object)
+    print(At)
+
+#Transfo matrice
+    Ml = M.tolist()
+    Mt1 =[Ml[2][::-1],Ml[1][::-1],Ml[0][::-1]]
+    Mt2 = np.array([np.array(i) for i in Mt1])
+    print(Mt2)
+
+#Convolution des tabl/mat transfo
+    slc=[]
+    for i in range(len(At)-(len(Mt2)-1)):
+        sl=[]
+        for j in range(len(At[i])-(len(Mt2)-1)):
+            s=0
+            
+            for k in range(len(Mt2)):
+                for l in range(len(Mt2[k])):
+                    s+=At[i+k][j+l]*Mt2[k][l]
+            sl.append(s)
+        slc.append(sl)
+    
+    slct = np.array([np.array(i, dtype=int) for i in slc], dtype=object)
+    print(slct)
