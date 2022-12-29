@@ -5,7 +5,7 @@ import numpy as np
 from scipy.fft import rfft, rfftfreq
 import matplotlib.pyplot as plt
 
-AudioName = "uprising.wav" # Audio File
+AudioName = "samples/uprising.wav" # Audio File
 SAMPLE_RATE, Audiodata = wavfile.read(AudioName)
 
 left_sound, right_sound = np.split(Audiodata, 2, axis=1)
